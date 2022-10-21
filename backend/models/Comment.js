@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
-const Comment = mongoose.Schema({
+const CommentSchema = mongoose.Schema({
     user: {
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'User'
@@ -20,4 +20,4 @@ CommentSchema.plugin(AutoIncrement, {
     start_seq: 1
 });
 
-module.exports = Comment;
+module.exports = mongoose.model('Comment', CommentSchema);

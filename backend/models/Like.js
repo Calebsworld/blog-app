@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
-const Like = mongoose.Schema({
+const LikeSchema = mongoose.Schema({
     user: {
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'User'
@@ -14,4 +14,4 @@ LikeSchema.plugin(AutoIncrement, {
     start_seq: 1
 });
 
-module.exports = Like;
+module.exports = mongoose.model('Like', LikeSchema);
