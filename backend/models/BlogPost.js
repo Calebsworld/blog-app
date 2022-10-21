@@ -22,18 +22,16 @@ const BlogPostSchema = mongoose.Schema({
     date: {
         type: date,
         required: true,
-        default: Date.now()
+        default: () => Date.now()
     },
     likes: [{
-         type: mongoose.Schema.Types.ObjectId,
-         required: true,
-         ref: 'User'
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'Like'
     }],
     comments: [{
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'User'
-   }]
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'Like'
+    }]
 }, 
 {
     timestamps: true
