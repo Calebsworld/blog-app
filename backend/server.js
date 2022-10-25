@@ -12,6 +12,8 @@ const errorHandler = require('./middleware/errorHandler');
 const corsOptions = require('./config/corsOptions');
 const connectDB = require('./config/dbConn');
 
+//===========================================================================================================
+
 const app = express();
 const PORT = process.env.PORT || 3500;
 
@@ -28,6 +30,14 @@ connectDB();
 app.use('/', express.static(path.join(__dirname, 'public')));
 
 app.use('/', require('./routes/root'));
+
+//===========================================================================================================
+
+const adminRoutes = require('./routes/admin');
+const userRoutes = require('./routes/user');
+
+app.use('/admin', adminRoutes);
+app.use('/users', userRoutes);
 
 app.all('*', (req, res) => {
     res.status(404);
@@ -50,6 +60,10 @@ mongoose.connection.once('open', () => {
 mongoose.connection.on('error', err => {
     console.log(err);
     logEvents(`${err.no}:${err.code}\t${err.syscall}\t${err.hostname}`, 'mongoErrLog.log');
+})
+
+mongoose.connection.on('disconnected', () => {
+    console.log('Disconnected from MongoDB');
 })
 
 

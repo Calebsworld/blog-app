@@ -6,7 +6,7 @@ const BlogPostSchema = mongoose.Schema({
         type: String,
         required: true
     }, 
-    body: {
+    content: {
         type: String,
         required: true
     },
@@ -15,22 +15,20 @@ const BlogPostSchema = mongoose.Schema({
         required: true
     },
     author: {
-        type: String,
+        type: mongoose.SchemaTypes.ObjectId,
         required: true,
-        default: process.env.author
+        ref: 'User' 
     },
-    date: {
-        type: date,
-        required: true,
-        default: () => Date.now()
-    },
+    tags: [String],
     likes: [{
         type: mongoose.SchemaTypes.ObjectId,
-        ref: 'Like'
+        ref: 'Like',
+        default: undefined
     }],
     comments: [{
         type: mongoose.SchemaTypes.ObjectId,
-        ref: 'Like'
+        ref: 'Comment',
+        default: undefined
     }]
 }, 
 {

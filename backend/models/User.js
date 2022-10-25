@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
-const userSchema = mongoose.Schema({
+const UserSchema = mongoose.Schema({
     username: {
         type: String,
         required: true,
@@ -19,8 +19,8 @@ const userSchema = mongoose.Schema({
     },
     role: {
         type: String,
-        default: 'guest'
-        // guest, user, admin 
+        default: 'user'
+        // user, admin 
     }
 });
 
@@ -30,5 +30,5 @@ UserSchema.plugin(AutoIncrement, {
     start_seq: 1
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', UserSchema);
 
