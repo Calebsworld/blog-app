@@ -23,7 +23,7 @@ const multer = require('multer');
 // });
 
 exports.getAllPosts = asyncHandler(async (req, res) => {
-    const blogPosts = BlogPost.find();
+    const blogPosts = await BlogPost.find();
     if (!blogPosts) {
         res.status(400).json({message: 'No blog posts found'});
     }

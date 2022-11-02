@@ -5,13 +5,17 @@ const adminController = require('../controllers/adminController');
 const router = express.Router();
 
 
-router.get('/api/posts', adminController.getAllPosts);
+router.get('/posts', adminController.getAllPosts);
 
-router.post('/api/posts', adminController.createPosts);
+router.get('/posts/:postId', (req, res) => {
+    // Implement in admin controller
+});
 
-router.post('/api/posts/:postId', adminController.updatePosts);
+router.post('/posts', adminController.createPosts);
 
-router.delete('/api/posts/:postsId', adminController.deletePosts);
+router.post('/posts/:postId', adminController.updatePosts);
+
+router.delete('/posts/:postsId', adminController.deletePosts);
 
 
 module.exports = router;

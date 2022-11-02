@@ -9,9 +9,8 @@ const path = require('path');
 
 const { logger, logEvents } = require('./middleware/logger');
 const errorHandler = require('./middleware/errorHandler');
-const corsOptions = require('./config/corsOptions');
 const connectDB = require('./config/dbConn');
-
+const corsOptions = require('./config/corsOptions');
 //===========================================================================================================
 
 const app = express();
@@ -23,21 +22,21 @@ connectDB();
 
  app.use(express.json());
 
+app.use(cors({
+    origin: '*'
+}))
+
  app.use(cookieParser());
 
- app.use(cors(corsOptions));
-
 app.use('/', express.static(path.join(__dirname, 'public')));
-
-app.use('/', require('./routes/root'));
 
 //===========================================================================================================
 
 const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/user');
 
-app.use('/admin', adminRoutes);
-app.use('/users', userRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/users', userRoutes);
 
 app.all('*', (req, res) => {
     res.status(404);
