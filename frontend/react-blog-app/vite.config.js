@@ -7,5 +7,10 @@ export default defineConfig({
       babel: {
         plugins: ['@babel/plugin-transform-react-jsx'],
       },
+      server: {
+        proxy: {
+          'api': 'http://localhost:3500/'
+        }
+      }
   })],
 })

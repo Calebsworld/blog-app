@@ -1,9 +1,12 @@
+import React from 'react'
+
+import { NavbarComp } from './components/navigation/NavbarComp'
+import { Routing } from './components/navigation/Routing'
+
+
+
 import './App.css'
-
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-import  Home  from './pages/Home';
-import  Blog  from './pages/Blog';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 function App() {
@@ -11,12 +14,8 @@ function App() {
   return (
   
     <div className="App">
-      <Router>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/blog' element={<Blog />} /> 
-        </Routes>
-      </Router>
+       <NavbarComp />
+        <Routing />
     </div>
   )
 }
