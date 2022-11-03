@@ -36,7 +36,7 @@ const BlogPostSchema = mongoose.Schema({
 });
 
 BlogPostSchema.plugin(AutoIncrement, {
-    inc_field: 'post',
+    inc_field: 'id',
     id: 'postNums',
     start_seq: 1
 });

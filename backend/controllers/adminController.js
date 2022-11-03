@@ -22,15 +22,6 @@ const multer = require('multer');
 //     region: bucketRegion
 // });
 
-exports.getAllPosts = asyncHandler(async (req, res) => {
-    const blogPosts = await BlogPost.find();
-    if (!blogPosts) {
-        res.status(400).json({message: 'No blog posts found'});
-    }
-    res.json(blogPosts);
-  
-});
-
 exports.createPosts =  asyncHandler(async (req, res) => {    
 // upload.single('image') goes before callback
 

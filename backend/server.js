@@ -31,12 +31,15 @@ app.use(cors({
 app.use('/', express.static(path.join(__dirname, 'public')));
 
 //===========================================================================================================
-
+const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/user');
+const blogRoutes = require('./routes/blogs');
 
+app.use('/api', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api', blogRoutes);
 
 app.all('*', (req, res) => {
     res.status(404);
