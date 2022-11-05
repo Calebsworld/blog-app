@@ -36,7 +36,7 @@ const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/user');
 const blogRoutes = require('./routes/blogs');
 
-app.use('/api', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api', blogRoutes);

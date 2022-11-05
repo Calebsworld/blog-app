@@ -6,14 +6,19 @@ const bcrypt = require('bcrypt');
 
 
 exports.registerUser = asyncHandler(async (req, res) => {
-    const { username, email, password } = req.body;
+    const { email, username, password } = req.body;
 
-    if (!username || !email || !password) {
+    if ( !email || !username || !password) {
         return res.status(400).json({message: 'All fields are required'});
     }
-    
-    const duplicate = await User.findOne({ username }).lean().exec();
-    if (duplicate) {
+   
+    const duplicateEmail = await User.findOne({ email }).lean().exec();
+    if (duplicateEmail) {
+        return res.status(409).json({message: 'Duplicate Username' });
+    }
+
+    const duplicateUsername = await User.findOne({ username }).lean().exec();
+    if (duplicateUsername) {
         return res.status(409).json({message: 'Duplicate Username' });
     }
 
