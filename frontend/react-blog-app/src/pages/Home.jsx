@@ -3,17 +3,21 @@ import React from 'react'
 import { Header } from '../components/Header'
 import { BlogsList } from '../components/blog/BlogsList'
 
-import { QueryClient, useQuery } from 'react-query'
+import { QueryClient, useQuery, useQueryClient } from 'react-query'
 import axios from 'axios'
 
 import Spinner from 'react-bootstrap/Spinner';
 
-const queryClient = new QueryClient()
-
 export const Home = () => {
 
-  const { isLoading, isError, data:blogs, error} = useQuery('getAllBlogs', async () => 
-    await axios.get('http://localhost:3500/api/admin/posts')
+  const queryClient = useQueryClient();
+
+  const { 
+    isLoading, 
+    isError, 
+    data:blogs, 
+    error} = useQuery('getAllBlogs', async () => 
+      await axios.get('http://localhost:3500/api/blogs')
     );
 
   if (isLoading) {

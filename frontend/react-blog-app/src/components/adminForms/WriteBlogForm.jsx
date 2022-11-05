@@ -1,5 +1,5 @@
 import React from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
 
 import { Header } from '../Header';
 
@@ -16,7 +16,8 @@ export const WriteBlogForm = () => {
     register, 
     handleSubmit, 
     formState:{errors},
-    watch 
+    watch,
+    control 
   } 
   = useForm({
       defaultValues: {
@@ -25,12 +26,23 @@ export const WriteBlogForm = () => {
         tags: []
       }
     });
-
+  
+  const {
+    fields,
+    append, 
+    prepend,
+    remove
+  }
+  = useFieldArray({
+    name: 'tags',
+    control
+  })
+    
   const onSubmit = data => {
     console.log(data)
   }
  
-  console.log(watch('firstName'));
+
   
 
   return (
@@ -80,19 +92,46 @@ export const WriteBlogForm = () => {
               />
               <p className='text-danger'>{errors.file?.message}</p>
             </Form.Group>
+            
+            { fields.map((field, index) => {  
+              return (
+                <section key={field.id} >
+                   <Form.Group className="mb-3" controlId="formBasicTags">
+                    <Form.Label>Tags</Form.Label>
+                    <Form.Control type="text" placeholder="Please enter tags" 
+                      {...register(`tags${index}`)} 
+                    />
+                    <p className='text-danger'>{errors.tags?.message}</p>
+                  </Form.Group>
+                </section> 
+               
+              )
+            })}    
+                
+                  
 
-            <Form.Group className="mb-3" controlId="formBasicTags">
-              <Form.Label>Tags</Form.Label>
-              <Form.Control type="text" placeholder="Please enter tags" 
-                {...register('tags', 
-                  { required:'tags are required'
-                  }
-                )} 
-              />
-              <p className='text-danger'>{errors.tags?.message}</p>
-            </Form.Group>
-
-            <Button variant="primary" type="submit">
+            <Button
+             className='m-1' 
+              onClick={() => {
+                append([])
+              }} 
+              variant="primary" 
+              type="button">
+              append
+            </Button>
+            
+            <Button 
+              onClick={() => {
+              append([])
+            }} 
+            variant="primary" type="button">
+            prepend
+            </Button>
+            <br></br>
+            <Button
+              className='m-1' 
+              variant="primary" 
+              type="submit">
               Submit
             </Button>
           </Form>

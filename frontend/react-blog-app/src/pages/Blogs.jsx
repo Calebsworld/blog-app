@@ -12,7 +12,7 @@ import axios from 'axios'
 export const Blogs = () => {
 
   const { isLoading, isError, data:blogs, error} = useQuery('getAllBlogs', async () => 
-    await axios.get('http://localhost:3500/api/admin/posts')
+    await axios.get('http://localhost:3500/api/blogs')
   );
 
   if (isLoading) {

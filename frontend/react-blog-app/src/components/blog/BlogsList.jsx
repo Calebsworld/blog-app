@@ -16,12 +16,19 @@ export const BlogsList = ( { blogs } ) => {
           )
     }
     return (
-    <ul>
-        {blogs.map(blog => {
-            return <BlogItem key={blog.post} blog={blog} />
-            }) 
-        }
-    </ul>
+    <Container>
+        <Row className='mx-auto'>
+            <Col>
+                <ul>
+                    {blogs.map(blog => {
+                    return <BlogItem key={blog.post} blog={blog} />
+                    }) 
+                    }
+                </ul>
+            </Col>
+        </Row>
+   
+    </Container>
   )
 }
 

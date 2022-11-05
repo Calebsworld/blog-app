@@ -37,7 +37,7 @@ export const NavbarComp= () => {
                 Blogs 
                 </Nav.Link>
                 <NavDropdown className='ms-1' title={<FontAwesomeIcon icon={faUser} className='me-1'/>} id="basic-nav-dropdown">
-                  <NavDropdown.Item as={NavLink} to={'/user/register'} >User Sign-up</NavDropdown.Item>
+                  <NavDropdown.Item as={NavLink} to={'/user/register'} >Create User Account</NavDropdown.Item>
                   <NavDropdown.Item as={NavLink} to={'/user/login'} >User Login</NavDropdown.Item>
                   <NavDropdown.Divider />
                   <NavDropdown.Item href="#action/3.4" className='text-success'>View User Profile</NavDropdown.Item>
