@@ -11,6 +11,7 @@ const { logger, logEvents } = require('./middleware/logger');
 const errorHandler = require('./middleware/errorHandler');
 const connectDB = require('./config/dbConn');
 const corsOptions = require('./config/corsOptions');
+
 //===========================================================================================================
 
 const app = express();

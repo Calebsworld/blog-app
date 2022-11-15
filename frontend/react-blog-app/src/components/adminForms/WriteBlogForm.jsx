@@ -1,139 +1,270 @@
 import React from 'react'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { useEffect } from 'react';
 
 import { Header } from '../Header';
+
+import { postBlog } from '../../apis/adminApis'
+import { useMutation, QueryClient } from 'react-query'
+
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+// import FormData from 'form-data';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
+
+
 
 export const WriteBlogForm = () => {
-  
+ 
+  const queryClient = new QueryClient()
+
+  const schema = yup.object().shape({
+    title: yup.string().min(5).max(50).required('Title Required'),
+    content: yup.string().min(5).max(5000).required('Content Required'),
+    tags: yup
+    .array()
+    .of(yup
+        .object()
+        .shape({
+          name: yup.string().min(5, 'Tag must contain atleast 5 characters').max(30, 'Tag must not exceed 30 characters').required()
+        })
+      )
+    .required('Tags required')
+  })
+
   const { 
     register, 
     handleSubmit, 
-    formState:{errors},
-    watch,
-    control 
+    formState,
+    control, 
+    reset
   } 
   = useForm({
+    mode: 'onChange',
+    resolver: yupResolver(schema),
       defaultValues: {
         title: '',
         content: '',
+        image: '',
         tags: []
       }
-    });
-  
+     });
+     
+  const { errors, isSubmitSuccessful } = formState;
+
   const {
     fields,
     append, 
-    prepend,
     remove
   }
   = useFieldArray({
     name: 'tags',
     control
   })
-    
-  const onSubmit = data => {
-    console.log(data)
-  }
- 
-
   
+  const postBlogMutation = useMutation(blogData => {
+    return postBlog(blogData);
+  })
+
+  const onSubmit = async data => {
+    console.log(data)
+    const formData = new FormData();
+    formData.append('title', data.title)
+    formData.append('content', data.content)
+    formData.append("image", data.image);
+    formData.append('tags', data.tags) 
+    postBlogMutation.mutate(formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+  } 
+  const onError = err => {
+    console.log(err)
+  }
+
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset();
+    }
+  }, [formState, reset]);
+
+
 
   return (
     <Container>
       <Header Header='Write New Blog Post'/>
       <Row>
         <Col lg={6} className='mx-auto mt-4'>
-          <Form onSubmit={handleSubmit(onSubmit)} >
-            <Form.Group className="mb-3" controlId="formBasicTitle">
+          <Form onSubmit={handleSubmit(onSubmit, onError)}>
+            <Form.Group className="mb-3" controlId="formTitle">
               <Form.Label>Title</Form.Label>
-              <Form.Control type="text" placeholder="Enter title" 
-                {...register('title',
-                  { required:'title is required',
-                    minLength: {
-                      value: 5,
-                      message: 'min length is 5'
-                    }  
-                  }
-                )} 
-              />
-              <p className='text-danger'>{errors.title?.message}</p>
-            </Form.Group>
-
-            <FloatingLabel controlId="formBasicContent" label="Content">
-              <Form.Control
-                as="textarea"
-                placeholder="Enter your content for your blog post"
-                style={{ height: '100px' }}
-                {...register('content', 
-                  { required:'content is required', 
-                    minLength: {
-                      value: 5,
-                      message: 'min length is 5'
-                    }  
-                  }
+              <Controller
+                name='title'
+                control={control}
+                render={({ field: { onChange, onBlur, value, name, ref } }) => (
+                  <Form.Control
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    type="text" 
+                    placeholder="Enter title"
+                    isInvalid={errors.title}
+                    
+                  />
                 )}
               />
-              <p className='text-danger'>{errors.content?.message}</p>
-            </FloatingLabel>
+              {errors.title?.type == "required" && (
+                <Form.Control.Feedback type="invalid">
+                  Title required
+                </Form.Control.Feedback>
+              )}
+              {errors.title?.type == "min" && (
+                <Form.Control.Feedback type="invalid">
+                Title must contain atleast 5 characters
+                </Form.Control.Feedback>
+              )}
+              {errors.title?.type == "max" && (
+                <Form.Control.Feedback type="invalid">
+                  Title must not exceed 50 characters
+                </Form.Control.Feedback>
+              )}
+            </Form.Group>
 
-            <Form.Group controlId="formFile" className="mb-3">
-              <Form.Label>Select file as an image for your posts</Form.Label>
-              <Form.Control type="file" 
-                {...register('image', 
-                  {required:'image is required'}
-                )} 
+            <Form.Group className="mb-3" controlId="formContent">
+              <Form.Label>Content</Form.Label>
+              <Controller
+                name='content'
+                control={control}
+                render={({ field: { onChange, onBlur, value, name, ref } }) => (
+                  <Form.Control
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    as="textarea"
+                    placeholder="Your friends are waiting for your thoughts..."
+                    style={{ height: '100px' }}
+                    isInvalid={errors.content}
+                  />
+                )}
               />
-              <p className='text-danger'>{errors.file?.message}</p>
+              {errors.content?.type == "required" && (
+                <Form.Control.Feedback type="invalid">
+                  Content required
+                </Form.Control.Feedback>
+              )}
+              {errors.content?.type == "min" && (
+                <Form.Control.Feedback type="invalid">
+                  Content must contain atleast 5 characters
+                </Form.Control.Feedback>
+              )}
+              {errors.content?.type == "max" && (
+                <Form.Control.Feedback type="invalid">
+                  Content must not exceed 50 characters
+                </Form.Control.Feedback>
+              )}
+            </Form.Group>
+    
+            <Form.Group controlId="formImage" className="mb-3">
+              <Form.Label>Select file as an image for your posts</Form.Label>
+              <Controller
+                name='image'
+                control={control}
+                render={({ field: { onChange, onBlur, value, name, ref } }) => (
+                  <Form.Control
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    type="file"
+                    isInvalid={errors.image}
+                  />
+                )}
+              />
+              
             </Form.Group>
             
-            { fields.map((field, index) => {  
-              return (
-                <section key={field.id} >
-                   <Form.Group className="mb-3" controlId="formBasicTags">
-                    <Form.Label>Tags</Form.Label>
-                    <Form.Control type="text" placeholder="Please enter tags" 
-                      {...register(`tags${index}`)} 
-                    />
-                    <p className='text-danger'>{errors.tags?.message}</p>
-                  </Form.Group>
-                </section> 
-               
-              )
-            })}    
-                
+            <Row>
+              <Col>
+              <h4 className='pb-3'>Hashtags</h4>
+                <Button
+                className='m-1' 
+                onClick={() => {
+                  append([{
+                    name: ''
+                  }])
+                }} 
+                variant="primary" 
+                type="button">
+                Add Tag
+               </Button>
+              </Col>
+            </Row>
+          
+            { fields.map((field, index) => {   
+                return (
+                  <section key={field.id} className='mt-3'>
+                    <Form.Group className="mb-3"  controlId="formTags">
+                      <Row>
+                        <Col>
+                          <label>Tags</label>
+                        </Col>
+                        
+                        <Col>
+                          <input name='tags' {...register(`tags.${index}.name`)} type="text" />
+                          {`errors.tags[${index}]?.name?.type` == "required" && (
+                            <Form.Control.Feedback type="invalid">
+                            Tag required
+                          </Form.Control.Feedback>
+                          )}
+                          {`errors.tags[${index}]?.name?.type` && (
+                            <Form.Control.Feedback type="invalid">
+                              Tag must contain atleast 5 characters
+                            </Form.Control.Feedback>
+                          )}
+                          {`errors.tags[${index}]?.name?.type` == "max" && (
+                            <Form.Control.Feedback type="invalid">
+                            Tag must not exceed 30 characters
+                          </Form.Control.Feedback>
+                          )}
+                        </Col>
                   
-
-            <Button
-             className='m-1' 
-              onClick={() => {
-                append([])
-              }} 
-              variant="primary" 
-              type="button">
-              append
-            </Button>
-            
-            <Button 
-              onClick={() => {
-              append([])
-            }} 
-            variant="primary" type="button">
-            prepend
-            </Button>
-            <br></br>
-            <Button
-              className='m-1' 
-              variant="primary" 
-              type="submit">
-              Submit
-            </Button>
+                        
+                        <Col>
+                          <Button 
+                            type='button' 
+                            className='btn-danger' 
+                            onClick={index => {
+                              remove(index)
+                            }}>
+                          Delete
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Form.Group>
+                  </section>
+                )
+            })}    
+            <Row className='mt-5'>
+              <Col>
+                <Button
+                  className='m-1' 
+                  variant="primary" 
+                  type="submit">
+                  Submit
+                </Button>
+                <Button 
+                  onClick={() => reset()} 
+                  variant="secondary" 
+                  type="button" 
+                  className='ms-1'>
+                  Reset
+                </Button>
+              </Col>
+            </Row>
           </Form>
         </Col>
       </Row>

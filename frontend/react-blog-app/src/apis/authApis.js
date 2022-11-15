@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const authApi = axios.create({
-    baseURL: 'http://localhost:3500/api/auth'
+    baseURL: `http://localhost:3500/api/auth`
 })
 
 export const postUser = async userData => {

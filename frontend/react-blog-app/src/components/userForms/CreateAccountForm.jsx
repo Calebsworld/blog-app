@@ -1,6 +1,5 @@
 import React from 'react'
-
-import { useState } from 'react'
+import { useEffect } from 'react';
 
 import { Header } from '../Header';
 
@@ -13,49 +12,57 @@ import Form from 'react-bootstrap/Form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faUser, faKey, faCircleCheck } from '@fortawesome/free-solid-svg-icons'
 
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { useMutation, QueryClient } from 'react-query'
-import { postUser } from './../../api/authApi';
+import { postUser } from '../../apis/authApis';
 
-// const queryClient = new QueryClient()
 
 export const CreateAccountForm = () => {
 
-  const [email, setEmail] = useState('')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const queryClient = new QueryClient()
 
   const schema = yup.object().shape({
     email: yup.string().email('Must be a valid email').required('Email Required'),
     username: yup.string().required('Username Required'),
-    password: yup.string().min(6).max(25).required('Password Required'),
-    confirmPassword: yup.string().oneOf([yup.ref('password'), null], "Passwords Don't Match").required('Password Required')
+    password: yup.string().min(6, 'Password must contain atleast 6 characters').max(25, 'Password must not exceed 25 characters').required('Password required'),
+    confirmPassword: yup.string().oneOf([yup.ref('password'), null], "Confirm password doesn't match").required('Confirm password required')
   })
 
   const {
-    register,
     handleSubmit,
-    watch,
-    formState: errors
+    formState,
+    reset,
+    control
   } = useForm({
-    resolver: yupResolver(schema)
+    mode: 'onChange',
+    resolver: yupResolver(schema), 
+    defaultValues: {
+      email: '',
+      username: '',
+      password: '',
+      confirmPassword: ''
+    }
   });
   
+  const { errors, isSubmitSuccessful, isDirty } = formState
+
   const postUserMutation = useMutation(userData => {
     return postUser(userData);
   })
 
-  const onSubmit = userData => {
-    postUserMutation.mutate(userData);
-    setEmail('')
-    setUsername('')
-    setPassword('')
-    setConfirmPassword('')
+  const onSubmit = data => {
+    console.log(data)
+    postUserMutation.mutate(data)
   }
+
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset();
+    }
+  }, [formState, reset]);
 
   return (
 
@@ -78,52 +85,140 @@ export const CreateAccountForm = () => {
 
       </div>
 
-       <Header Header='User Sign-up'/>
+       <Header Header='Create Account'/>
       <Row>
         <Col lg={6} className='mx-auto mt-4'>
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <Form.Group onChange={(e) => setEmail(e.target.value)} className="mb-3" >
+            <Form.Group className="mb-3" >
               <Form.Label className='lead'>
                 <FontAwesomeIcon icon={faEnvelope} className='me-1' />
               Email
               </Form.Label>
-              <Form.Control type="text" placeholder="name@example.com" value={email} id='email' {...register('email')} />
-              <p className='text-danger mt-1'>{errors.email?.message}</p>
+              <Controller
+                  name="email"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { onChange, onBlur, value, name, ref } }) => (
+                    <Form.Control
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      type="email"
+                      placeholder="name@example.com"
+                      isInvalid={errors.username}
+                    />
+                  )}
+                />
+              {errors.email?.type === "required" && (
+                <Form.Control.Feedback type="invalid">
+                  Email required
+                </Form.Control.Feedback>
+              )}
             </Form.Group>
               
-            <Form.Group onChange={(e) => setUsername(e.target.value)} className="mb-3">
+            <Form.Group className="mb-3">
               <Form.Label className='lead'>
                 <FontAwesomeIcon icon={faUser} className='me-1'/>  
               Username
               </Form.Label>
-              <Form.Control className='lead' type="text" placeholder="Username" value={username} id="username" {...register('username')} />
-              <p className='text-danger mt-1'>{errors.username?.message}</p>
+              <Controller
+                  name="username"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { onChange, onBlur, value, name, ref } }) => (
+                    <Form.Control
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      type="text"
+                      placeholder="Username"
+                      isInvalid={errors.username}
+                    />
+                  )}
+                />
+              {
+                
+              }
+              {errors.username?.type == "required" ? 
+                (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.username?.message}
+                  </Form.Control.Feedback>
+                ) :
+                  <p>Username must contain zero spaces</p>
+              }
             </Form.Group>
 
-            <Form.Group onChange={(e) => setPassword(e.target.value)} className="mb-3">
+            <Form.Group className="mb-3">
               <Form.Label className='lead'>
                 <FontAwesomeIcon icon={faKey} className='me-1' />
               Password
               </Form.Label>
-              <Form.Control type="password" placeholder="******" value={password} id='password' {...register('password')} />
-              {errors.password?.message ? <p className='text-danger mt-1'>{errors.password?.message}</p> : 
-              <p className='mt-1'>Password must be between 6-25 characters</p>
-              }
-            </Form.Group>
-
-            <Form.Group onChange={(e) => setConfirmPassword(e.target.value)} className="mb-3">
+                <Controller
+                  name="password"
+                  control={control}
+                  rules={{ required: true, min:6, max:25 }}
+                  render={({ field: { onChange, onBlur, value, name, ref } }) => (
+                    <Form.Control
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      type="password"
+                      placeholder="******"
+                      isInvalid={errors.password}
+                    />
+                  )}
+                />
+              {errors.password?.type == "min" && (
+                <Form.Control.Feedback type="invalid">
+                  Password must contain atleast 6 characters
+                </Form.Control.Feedback>
+              )}
+              {errors.password?.type == "max" && (
+                <Form.Control.Feedback type="invalid">
+                  Password must not exceed 25 characters
+                </Form.Control.Feedback>
+              )}
+            </Form.Group> 
+          
+            <Form.Group className="mb-3">
               <Form.Label className='lead'>
                 <FontAwesomeIcon icon={faCircleCheck} className='me-1' />
               Confirm Password
               </Form.Label>
-              <Form.Control className='lead' type="password" placeholder="******" value={confirmPassword} id='confirmPassword' {...register('confirmPassword')} />
-              {errors.confirmPassword?.message ? <p className='text-danger mt-1'>{errors.confirmPassword?.message}</p> : 
-              <p className='mt-1'>Password must be between 6-25 characters</p>
+              <Controller
+                  name="confirmPassword"
+                  control={control}
+                  rules={{
+                    required: true, 
+                    validate: {
+                      confirmPasswordMatches: password => password === confirmPassword 
+                    } 
+                  }}
+                  render={({ field: { onChange, onBlur, value, name, ref } }) => (
+                    <Form.Control 
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      type="password"
+                      placeholder="******"
+                      isInvalid={errors.confirmPassword}
+                    />
+                  )}
+                />
+                {errors.confirmPassword?.message ? ( 
+                  <Form.Control.Feedback type="invalid">
+                    Confirm password must match password
+                  </Form.Control.Feedback> )
+                 : <p></p> 
               }
             </Form.Group>
 
             <Button variant="primary" type="submit">
               Submit
+            </Button>
+            <Button onClick={() => reset()} variant="secondary" type="button" className='ms-1'>
+              Reset
             </Button>
           </Form>
         </Col>

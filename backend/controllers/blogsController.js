@@ -1,4 +1,3 @@
-const { findById } = require('../models/BlogPost');
 const BlogPost = require('../models/BlogPost');
 
 const asyncHandler = require('express-async-handler');
