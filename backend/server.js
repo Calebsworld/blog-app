@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser')
 const cors = require('cors');
+const multer = require('multer')
 
 const path = require('path');
 
@@ -19,23 +20,23 @@ const PORT = process.env.PORT || 3500;
 
 connectDB();
 
- app.use(logger);
+app.use(logger);
 
- app.use(express.json());
+app.use(express.json());
 
 app.use(cors({
     origin: '*'
 }))
 
- app.use(cookieParser());
+app.use(cookieParser());
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 
 //===========================================================================================================
-const authRoutes = require('./routes/auth');
-const adminRoutes = require('./routes/admin');
-const userRoutes = require('./routes/user');
-const blogRoutes = require('./routes/blogs');
+const authRoutes = require('./routes/authRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const userRoutes = require('./routes/userRoutes');
+const blogRoutes = require('./routes/blogRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
@@ -52,6 +53,18 @@ app.all('*', (req, res) => {
         res.type('text').send('404 Not Found');
     }
 });
+
+// app.use((err, req, res, next) => {
+//     if (err instanceof multer.MulterError) {
+//       res.statusCode = 400;
+//       res.send(err.code);
+//     } else if (err) {
+//       if (err.message === "FILE_MISSING") {
+//         res.statusCode = 400;
+//         res.send("FILE_MISSING");
+//       }
+//     }
+//   });
 
 app.use(errorHandler);
 

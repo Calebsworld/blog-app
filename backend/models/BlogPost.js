@@ -10,15 +10,11 @@ const BlogPostSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    image: {
-        type: String,
-        required: true
-    },
-    author: {
-        type: mongoose.SchemaTypes.ObjectId,
-        required: true,
-        ref: 'User' 
-    },
+    // author: {
+    //     type: mongoose.SchemaTypes.ObjectId,
+    //     required: true,
+    //     ref: 'User' 
+    // },
     tags: [String],
     likes: [{
         type: mongoose.SchemaTypes.ObjectId,

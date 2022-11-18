@@ -1,66 +1,68 @@
 const BlogPost = require('../models/BlogPost');
 
 const asyncHandler = require('express-async-handler');
-const multer = require('multer');
 
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-
-// middleware that processes a file and stores it in a memory before placing image in s3 bucket
-const storage = multer.memoryStorage()
-const upload = multer({ storage: storage, limits: { fieldSize: 10 * 1024 * 1024 } })
 
 const bucketName = process.env.BUCKET_NAME;
 const bucketRegion = process.env.BUCKET_REGION;
 const accessKey = process.env.ACCESS_KEY;
 const secretAccessKey = process.env.SECRET_ACCESS_KEY;
 
-exports.createPosts = (upload.single('image'), asyncHandler (async (req, res) => {    
-    const { title, content, tags} = req.body;
+exports.createPosts = asyncHandler (async (req, res) => {        
+   
+    const title = req.body.title;
+    const content = req.body.content;
+    const tags = req.body.tags
     
-    // if (!title || !content || !Array.isArray(tags) || !tags.length) {
-    //     res.status(400).json({message: 'All fields are required'})
-    // }
+    if (!title || !content || !Array.isArray(tags) || !tags.length) {
+       return res.status(400).json({message: 'All fields are required'})
+    }
 
-    // const duplicate = await BlogPost.findOne({ title }).lean().exec();
-    // if (duplicate) {
-    //     return res.status(409).json({message: 'duplicate title' });
-    // }
+    if (!req.file) {
+        throw Error("FILE_MISSING");
+      } 
 
-    // const blogPostObject = {title, content, tags};
-    // // const blogPost = await BlogPost.create(blogPostObject);
+    const duplicate = await BlogPost.findOne({ title }).lean().exec();
+    if (duplicate) {
+        return res.status(409).json({message: 'duplicate title' });
+    }
 
-    // // if (blogPostObject) {
-    // //     res.status(201).json({message: `Blog post created ${blogPostObject.title}`});
-    // // } else {
-    // //     res.status(409).json({message: 'Invalid data recieved'});
-    // // }
+    const blogPostObject = {title, content, tags};
+    const blogPost = await BlogPost.create(blogPostObject);
 
-    // const s3 = new S3Client({
-    //     credentials: {
-    //         accessKeyId:  accessKey,
-    //         secretAccessKey: secretAccessKey,
-    //     },
-    //     region: bucketRegion
-    // });
+    if (blogPost) {
 
-    console.log(req.file)
+        const s3 = new S3Client({
+            credentials: {
+                accessKeyId: accessKey,
+                secretAccessKey: secretAccessKey,
+            },
+            region: bucketRegion
+        });
     
-    // const params = {
-    //     Bucket: bucketName,
-    //     Key: req.file.originalname,
-    //     Body: req.file.buffer,
-    //     ContentType: req.file.mimetype,
-    // };
+        const params = {
+            Bucket: bucketName,
+            Key: req.file.originalname,
+            Body: req.file.buffer,
+            ContentType: req.file.mimetype,
+        };
+    
+        const command = new PutObjectCommand(params);
+        await s3.send(command);
 
-    // const command = new PutObjectCommand(params);
-    // await s3.send(command);
-}));
+        return res.status(201).json({message: `Blog post created ${blogPostObject.title}`});
+    } else {
+        return res.status(409).json({message: 'Invalid data recieved'});
+    }
+
+});
 
 exports.updatePosts =  asyncHandler(async (req, res) => {
     const { id, title, content, image, tags, author } = req.body;
 
     if (!id || !title || !content || !image || !Array.isArray(tags) || !tags.length || !author) {
-        res.status(400).json({message: 'All fields are required'})
+        return res.status(400).json({message: 'All fields are required'})
     }
 
     const duplicate = await User.findOne({ title }).lean().exec();

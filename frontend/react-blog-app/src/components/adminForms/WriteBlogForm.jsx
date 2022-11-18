@@ -17,8 +17,6 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
-
-
 export const WriteBlogForm = () => {
  
   const queryClient = new QueryClient()
@@ -31,10 +29,11 @@ export const WriteBlogForm = () => {
     .of(yup
         .object()
         .shape({
-          name: yup.string().min(5, 'Tag must contain atleast 5 characters').max(30, 'Tag must not exceed 30 characters').required()
+          tag: yup.string().min(5, 'Tag must contain atleast 2 characters').max(30, 'Tag must not exceed 30 characters').required()
         })
       )
     .required('Tags required')
+  
   })
 
   const { 
@@ -51,7 +50,9 @@ export const WriteBlogForm = () => {
         title: '',
         content: '',
         image: '',
-        tags: []
+        tags: [{
+          tag: ''
+        }]
       }
      });
      
@@ -71,18 +72,20 @@ export const WriteBlogForm = () => {
     return postBlog(blogData);
   })
 
+  const form = document.getElementById('form')
+
+  // takes form data if validation passes
   const onSubmit = async data => {
     console.log(data)
-    const formData = new FormData();
-    formData.append('title', data.title)
-    formData.append('content', data.content)
-    formData.append("image", data.image);
-    formData.append('tags', data.tags) 
-    postBlogMutation.mutate(formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+    const formData = new FormData(form);
+    const completeFormData = new FormData();
+    const tagsFormData = new FormData();
+    completeFormData.append('title', formData.get('title'));
+    completeFormData.append('content', formData.get('content'));
+    completeFormData.append('image', formData.get('image'));
+    data.tags.forEach(tag => completeFormData.append('tags[]', JSON.stringify(tag)));
+    postBlogMutation.mutate(completeFormData);
   } 
-  const onError = err => {
-    console.log(err)
-  }
 
   useEffect(() => {
     if (isSubmitSuccessful) {
@@ -90,14 +93,12 @@ export const WriteBlogForm = () => {
     }
   }, [formState, reset]);
 
-
-
   return (
     <Container>
       <Header Header='Write New Blog Post'/>
       <Row>
         <Col lg={6} className='mx-auto mt-4'>
-          <Form onSubmit={handleSubmit(onSubmit, onError)}>
+          <Form id='form' onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3" controlId="formTitle">
               <Form.Label>Title</Form.Label>
               <Controller
@@ -112,7 +113,6 @@ export const WriteBlogForm = () => {
                     type="text" 
                     placeholder="Enter title"
                     isInvalid={errors.title}
-                    
                   />
                 )}
               />
@@ -168,18 +168,19 @@ export const WriteBlogForm = () => {
               )}
             </Form.Group>
     
-            <Form.Group controlId="formImage" className="mb-3">
+            <Form.Group className="mb-3">
               <Form.Label>Select file as an image for your posts</Form.Label>
               <Controller
                 name='image'
                 control={control}
                 render={({ field: { onChange, onBlur, value, name, ref } }) => (
                   <Form.Control
+                    type="file"
+                    id='file'
                     name={name}
                     value={value}
                     onChange={onChange}
                     onBlur={onBlur}
-                    type="file"
                     isInvalid={errors.image}
                   />
                 )}
@@ -194,7 +195,7 @@ export const WriteBlogForm = () => {
                 className='m-1' 
                 onClick={() => {
                   append([{
-                    name: ''
+                    tag: ''
                   }])
                 }} 
                 variant="primary" 
@@ -204,49 +205,44 @@ export const WriteBlogForm = () => {
               </Col>
             </Row>
           
-            { fields.map((field, index) => {   
-                return (
-                  <section key={field.id} className='mt-3'>
-                    <Form.Group className="mb-3"  controlId="formTags">
-                      <Row>
-                        <Col>
-                          <label>Tags</label>
-                        </Col>
-                        
-                        <Col>
-                          <input name='tags' {...register(`tags.${index}.name`)} type="text" />
-                          {`errors.tags[${index}]?.name?.type` == "required" && (
-                            <Form.Control.Feedback type="invalid">
-                            Tag required
-                          </Form.Control.Feedback>
-                          )}
-                          {`errors.tags[${index}]?.name?.type` && (
-                            <Form.Control.Feedback type="invalid">
-                              Tag must contain atleast 5 characters
-                            </Form.Control.Feedback>
-                          )}
-                          {`errors.tags[${index}]?.name?.type` == "max" && (
-                            <Form.Control.Feedback type="invalid">
-                            Tag must not exceed 30 characters
-                          </Form.Control.Feedback>
-                          )}
-                        </Col>
-                  
-                        
-                        <Col>
-                          <Button 
-                            type='button' 
-                            className='btn-danger' 
-                            onClick={index => {
-                              remove(index)
-                            }}>
-                          Delete
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Form.Group>
-                  </section>
-                )
+            {fields.map((field, index) => {
+              return (
+                <section key={field.id} className='mt-3'>
+                  <Row>
+                    <Col>
+                      <label>
+                        <input placeholder='#' name='tag' {...register(`tags.${index}.tag`)} type="text" />
+                      </label>
+                      {`errors.tags[${index}]?.tag?.type` == "required" && (
+                        <Form.Control.Feedback type="invalid">
+                          Tag required
+                        </Form.Control.Feedback>
+                      )}
+                      {`errors.tags[${index}]?.tag?.type` && (
+                        <Form.Control.Feedback type="invalid">
+                          Tag must contain atleast 5 characters
+                        </Form.Control.Feedback>
+                      )}
+                      {`errors.tags[${index}]?.tag?.type` == "max" && (
+                        <Form.Control.Feedback type="invalid">
+                          Tag must not exceed 30 characters
+                        </Form.Control.Feedback>
+                      )}
+                    </Col>
+
+                    <Col>
+                      <Button
+                        type='button'
+                        className='btn-danger'
+                        onClick={index => {
+                          remove(index)
+                        }}>
+                        Delete
+                      </Button>
+                    </Col>
+                  </Row>
+                </section>
+              )
             })}    
             <Row className='mt-5'>
               <Col>

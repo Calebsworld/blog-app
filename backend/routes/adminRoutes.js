@@ -1,10 +1,14 @@
 const express = require('express');
+const multer = require('multer');
 
 const adminController = require('../controllers/adminController');
 
 const router = express.Router();
 
-router.post('/posts', adminController.createPosts);
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage, limits: { fieldSize: 25 * 1024 * 1024 } })
+
+router.post('/posts', upload.single('image'), adminController.createPosts);
 
 router.post('/posts/:postId', adminController.updatePosts);
 
