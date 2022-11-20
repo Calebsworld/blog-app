@@ -9,8 +9,7 @@ const LikeSchema = mongoose.Schema({
 });
 
 LikeSchema.plugin(AutoIncrement, {
-    inc_field: 'like',
-    id: 'id',
+    inc_field: 'id',
     start_seq: 1
 });
 

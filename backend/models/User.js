@@ -25,8 +25,7 @@ const UserSchema = mongoose.Schema({
 });
 
 UserSchema.plugin(AutoIncrement, {
-    inc_field: 'user',
-    id: 'id',
+    inc_field: '1',
     start_seq: 1
 });
 

@@ -15,7 +15,10 @@ const BlogPostSchema = mongoose.Schema({
     //     required: true,
     //     ref: 'User' 
     // },
-    tags: [String],
+    tags: [{
+        type: String,
+        required: true
+    }],
     likes: [{
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'Like',
@@ -33,7 +36,6 @@ const BlogPostSchema = mongoose.Schema({
 
 BlogPostSchema.plugin(AutoIncrement, {
     inc_field: 'id',
-    id: 'postNums',
     start_seq: 1
 });
 

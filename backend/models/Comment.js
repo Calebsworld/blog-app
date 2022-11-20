@@ -15,8 +15,7 @@ const CommentSchema = mongoose.Schema({
 });
 
 CommentSchema.plugin(AutoIncrement, {
-    inc_field: 'comment',
-    id: 'id',
+    inc_field: 'id',
     start_seq: 1
 });
 

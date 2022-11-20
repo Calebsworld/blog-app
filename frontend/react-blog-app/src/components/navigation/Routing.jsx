@@ -6,10 +6,12 @@ import { Home } from '../../pages/Home'
 import { About } from '../../pages/About'
 import { Blogs } from '../../pages/Blogs'
 import { BlogItem } from '../blog/BlogItem'
-import { CreateAccountForm } from '../userForms/CreateAccountForm'
-import { LoginForm } from '../userForms/LoginForm'
-import { WriteBlogForm } from '../adminForms/WriteBlogForm'
-import { UpdateBlogForm } from '../adminForms/UpdateBlogForm'
+import { CreateAccountForm } from '../auth/CreateAccountForm'
+import { LoginForm } from '../auth/LoginForm'
+import { AdminBlogs } from '../admin/AdminBlogs'
+import { AdminBlogItem } from '../admin/AdminBlogItem'
+import { WriteBlogForm } from '../admin/WriteBlogForm'
+import { UpdateBlogForm } from '../admin/UpdateBlogForm'
 
 export const Routing = () => {
   return (
@@ -23,7 +25,10 @@ export const Routing = () => {
           <Route path='/user/register' element={<CreateAccountForm />} />
           <Route path='/user/login' element={<LoginForm />} />
           <Route path='/admin/write' element={<WriteBlogForm />} />
-          <Route path='/admin/update' element={<UpdateBlogForm />} />
+          <Route path='/admin/blogs'>
+              <Route index element={<AdminBlogs/>} />
+              <Route path=':id' element={<AdminBlogItem />} />
+          </Route>
           <Route path="*" element={<Home />} />
         </Routes>
   )

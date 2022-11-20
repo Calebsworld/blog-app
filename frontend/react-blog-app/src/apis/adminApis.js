@@ -5,5 +5,9 @@ export const adminApi = axios.create({
 })
 
 export const postBlog = async blogData => {
-    return await adminApi.post('/posts', blogData)  
+    return await adminApi.post(`/posts`, blogData)  
+}
+
+export const updateBlog = async blogData => {
+    return await adminApi.post(`/posts/${blogData.id}`, blogData)
 }

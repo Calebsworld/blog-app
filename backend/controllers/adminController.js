@@ -59,9 +59,11 @@ exports.createPosts = asyncHandler (async (req, res) => {
 });
 
 exports.updatePosts =  asyncHandler(async (req, res) => {
-    const { id, title, content, image, tags, author } = req.body;
+    const id = req.body.id;
+    const title = req.body.title;
+    const content = req.body.content; 
 
-    if (!id || !title || !content || !image || !Array.isArray(tags) || !tags.length || !author) {
+    if (!id || !title || !content || !Array.isArray(tags) || !tags.length) {
         return res.status(400).json({message: 'All fields are required'})
     }
 
@@ -80,6 +82,8 @@ exports.updatePosts =  asyncHandler(async (req, res) => {
     blogPost.title = title;
     blogPost.content = content;
     blogPost.tags = tags;
+
+    // update image in s3 bucket
 
     const updatedBlogPost = await BlogPost.save(blogPost);
     res.status(201).json({message: `Successful update: ${updatedBlogPost}`});

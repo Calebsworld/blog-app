@@ -44,7 +44,7 @@ export const NavbarComp= () => {
                 </NavDropdown>
                 <NavDropdown className='ms-1' title={<FontAwesomeIcon icon={faLock} className='me-1'/>} id="basic-nav-dropdown">
                   <NavDropdown.Item as={NavLink} to={'/admin/write'} >Admin Write Blog</NavDropdown.Item>
-                  <NavDropdown.Item as={NavLink} to={'/admin/update'} >Admin Update Blog</NavDropdown.Item>
+                  <NavDropdown.Item as={NavLink} to={'/admin/blogs'} >Admin Blogs</NavDropdown.Item>
                   <NavDropdown.Divider />
                   <NavDropdown.Item href="#action/3.4">View Admin Profile</NavDropdown.Item>
                 </NavDropdown>

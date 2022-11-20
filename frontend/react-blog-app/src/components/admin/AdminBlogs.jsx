@@ -1,17 +1,17 @@
 import React from 'react'
 
-import { BlogsList } from '../components/blog/BlogsList'
+import { AdminBlogsList } from './AdminBlogsList';
 
 import Spinner from 'react-bootstrap/Spinner';
 
 import { QueryClient, useQuery } from 'react-query'
 import axios from 'axios'
- 
- const queryClient = new QueryClient()
 
-export const Blogs = () => {
+const queryClient = new QueryClient()
 
-  const { isLoading, isError, data:blogs, error} = useQuery('getAllBlogs', async () => 
+export const AdminBlogs = () => {
+    
+    const { isLoading, isError, data:blogs, error} = useQuery('getAllBlogs', async () => 
     await axios.get('http://localhost:3500/api/blogs')
   );
 
@@ -30,11 +30,7 @@ export const Blogs = () => {
   }
   
   return (
-      <BlogsList blogs={blogs.data} />
+      <AdminBlogsList blogs={blogs.data} />
     )
-  
-
-  
-  
 }
 
