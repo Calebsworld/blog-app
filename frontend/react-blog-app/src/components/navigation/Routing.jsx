@@ -25,6 +25,7 @@ export const Routing = () => {
           <Route path='/user/register' element={<CreateAccountForm />} />
           <Route path='/user/login' element={<LoginForm />} />
           <Route path='/admin/write' element={<WriteBlogForm />} />
+          <Route path='/admin/update' element={<UpdateBlogForm />} />
           <Route path='/admin/blogs'>
               <Route index element={<AdminBlogs/>} />
               <Route path=':id' element={<AdminBlogItem />} />

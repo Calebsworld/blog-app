@@ -1,6 +1,13 @@
 import React from 'react'
 import { useEffect } from 'react';
 
+import { useForm, Controller } from 'react-hook-form';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import { useMutation, QueryClient } from 'react-query'
+import { postUser } from '../../hooks/authApis';
+
 import { Header } from '../Header';
 
 import Container from 'react-bootstrap/Container';
@@ -12,12 +19,7 @@ import Form from 'react-bootstrap/Form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faUser, faKey, faCircleCheck } from '@fortawesome/free-solid-svg-icons'
 
-import { useForm, Controller } from 'react-hook-form';
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 
-import { useMutation, QueryClient } from 'react-query'
-import { postUser } from '../../apis/authApis';
 
 
 export const CreateAccountForm = () => {

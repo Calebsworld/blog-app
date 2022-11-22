@@ -11,3 +11,7 @@ export const postBlog = async blogData => {
 export const updateBlog = async blogData => {
     return await adminApi.post(`/posts/${blogData.id}`, blogData)
 }
+
+export const deleteBlog = async id => {
+    return await adminApi.delete(`/posts/${id}`)
+}

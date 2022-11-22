@@ -1,10 +1,13 @@
 import React from 'react'
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { Header } from '../Header';
 
-import { updateBlog } from '../../apis/adminApis'
-import { useMutation, QueryClient } from 'react-query'
+import { useMutation, QueryClient, useQuery} from 'react-query'
+
+import { updateBlog } from '../../hooks/adminApis'
+import { useBlogData } from '../../hooks/blogApis';
 
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import * as yup from 'yup';
@@ -55,6 +58,7 @@ const {
     }
    });
    
+
 const { errors, isSubmitSuccessful } = formState;
 
 const {
@@ -67,23 +71,34 @@ const {
   control
 })
 
+const location = useLocation();
+const blogId = location.state;
+const { isLoading, data, isError, error } = useBlogData(blogId)
+console.log(data?.data)
+
+//Use React-hook-form to set the values of each field, so that it will show up inside the form. 
+
+
 const updateBlogMutation = useMutation(blogData => {
   return updateBlog(blogData);
 })
 
-const form = document.getElementById('form')
+  const createFormDataObj = data => {
+    const form = document.getElementById('form')
+    const formData = new FormData(form);
+    const completeFormData = new FormData();
+    completeFormData.append('id', formData.get('id'));
+    completeFormData.append('title', formData.get('title'));
+    completeFormData.append('content', formData.get('content'));
+    completeFormData.append('image', formData.get('image'));
+    data.tags.forEach(tag => completeFormData.append('tags[]', JSON.stringify(tag)));
+    return completeFormData;
+  }
 
-// takes form data if validation passes
 const onSubmit = async data => {
   console.log(data)
-  const formData = new FormData(form);
-  const completeFormData = new FormData();
-  completeFormData.append('id', formData.get('id'));
-  completeFormData.append('title', formData.get('title'));
-  completeFormData.append('content', formData.get('content'));
-  completeFormData.append('image', formData.get('image'));
-  data.tags.forEach(tag => completeFormData.append('tags[]', JSON.stringify(tag)));
-  updateBlogMutation.mutate(completeFormData);
+  const fd = createFormDataObj()
+  updateBlogMutation.mutate(fd);
 } 
 
 useEffect(() => {
@@ -94,7 +109,7 @@ useEffect(() => {
 
 return (
   <Container>
-    <Header Header='Write New Blog Post'/>
+    <Header Header='Update Blog Post'/>
     <Row>
       <Col lg={6} className='mx-auto mt-4'>
         <Form id='form' onSubmit={handleSubmit(onSubmit)}>

@@ -1,19 +1,20 @@
 import React from 'react'
 
+import { QueryClient} from 'react-query'
+
+import { useGetAllBlogs } from '../../hooks/blogApis';
 import { AdminBlogsList } from './AdminBlogsList';
 
 import Spinner from 'react-bootstrap/Spinner';
 
-import { QueryClient, useQuery } from 'react-query'
-import axios from 'axios'
+
+
 
 const queryClient = new QueryClient()
 
 export const AdminBlogs = () => {
     
-    const { isLoading, isError, data:blogs, error} = useQuery('getAllBlogs', async () => 
-    await axios.get('http://localhost:3500/api/blogs')
-  );
+    const { isLoading, isError, data:blogs, error} = useGetAllBlogs();
 
   if (isLoading) {
     return (

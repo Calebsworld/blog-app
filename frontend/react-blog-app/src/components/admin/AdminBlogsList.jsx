@@ -19,7 +19,7 @@ export const AdminBlogsList = ({ blogs }) => {
                 <Col>
                     <ul>
                         {blogs.map(blog => {
-                        return <AdminBlogItem key={blog.post} blog={blog} />
+                            return <AdminBlogItem key={blog.id} blog={blog} />
                         }) 
                         }
                     </ul>

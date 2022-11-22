@@ -7,6 +7,11 @@ import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 
 export const BlogItem = ({ blog }) => {
+  
+  const tags = blog.tags.map(tag => {
+    return JSON.parse(tag)
+}) 
+  
   return (
     <Container>
       <Row>
@@ -18,9 +23,9 @@ export const BlogItem = ({ blog }) => {
               <Card.Text> { blog.content} </Card.Text>
             </Card.Body>
           <ListGroup className="list-group-flush">
-          {blog.tags.map(tag => {
+          {tags.map(tag => {
             return (
-              <ListGroup.Item key={tag.rowKey}> #{ tag } </ListGroup.Item>
+              <ListGroup.Item key={tag.rowKey}> #{ tag.tag } </ListGroup.Item>
             )
           })}  
           </ListGroup>

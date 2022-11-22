@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 import { Header } from '../Header';
 
-import { postBlog } from '../../apis/adminApis'
+import { postBlog } from '../../hooks/adminApis'
 import { useMutation, QueryClient } from 'react-query'
 
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
@@ -72,20 +72,23 @@ export const WriteBlogForm = () => {
     return postBlog(blogData);
   })
 
-  const form = document.getElementById('form')
-
-  // takes form data if validation passes
-  const onSubmit = async data => {
-    console.log(data)
+  const createFormDataObj = data => {
+    const form = document.getElementById('form')
     const formData = new FormData(form);
     const completeFormData = new FormData();
-    const tagsFormData = new FormData();
+    completeFormData.append('id', formData.get('id'));
     completeFormData.append('title', formData.get('title'));
     completeFormData.append('content', formData.get('content'));
     completeFormData.append('image', formData.get('image'));
     data.tags.forEach(tag => completeFormData.append('tags[]', JSON.stringify(tag)));
-    postBlogMutation.mutate(completeFormData);
-  } 
+    return completeFormData;
+  }
+
+const onSubmit = async data => {
+  console.log(data)
+  const fd = createFormDataObj()
+  postBlogMutation.mutate(fd);
+} 
 
   useEffect(() => {
     if (isSubmitSuccessful) {
