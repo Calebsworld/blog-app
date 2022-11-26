@@ -10,7 +10,7 @@ const upload = multer({ storage: storage, limits: { fieldSize: 25 * 1024 * 1024 
 
 router.post('/posts', upload.single('image'), adminController.createPosts);
 
-router.post('/posts/:postId', adminController.updatePosts);
+router.post('/posts/:postsId', upload.single('image'), adminController.updatePosts);
 
 router.delete('/posts/:postsId', adminController.deletePosts);
 

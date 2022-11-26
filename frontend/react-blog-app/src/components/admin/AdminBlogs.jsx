@@ -1,20 +1,17 @@
 import React from 'react'
 
-import { QueryClient} from 'react-query'
+import { useQueryClient} from 'react-query'
 
 import { useGetAllBlogs } from '../../hooks/blogApis';
 import { AdminBlogsList } from './AdminBlogsList';
 
 import Spinner from 'react-bootstrap/Spinner';
 
-
-
-
-const queryClient = new QueryClient()
-
 export const AdminBlogs = () => {
     
-    const { isLoading, isError, data:blogs, error} = useGetAllBlogs();
+const queryClient = new useQueryClient()
+  
+const { isLoading, isError, data:blogs, error} = useGetAllBlogs();
 
   if (isLoading) {
     return (

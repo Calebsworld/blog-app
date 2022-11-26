@@ -2,7 +2,9 @@ import axios from 'axios'
 import { useMutation, useQuery  } from 'react-query'
 
 export const useGetAllBlogs = () => {
-    return useQuery('getAllBlogs', getAllBlogs) 
+    return useQuery('getAllBlogs', getAllBlogs, {
+        retry: 3
+    }) 
 }
 
 export const getAllBlogs = () => { 

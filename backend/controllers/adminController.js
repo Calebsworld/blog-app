@@ -59,17 +59,19 @@ exports.createPosts = asyncHandler (async (req, res) => {
 });
 
 exports.updatePosts =  asyncHandler(async (req, res) => {
-    const id = req.body.id;
+    const id = req.params.postsId
     const title = req.body.title;
     const content = req.body.content; 
+    const tags = req.body.tags
+    console.log(title)
 
     if (!id || !title || !content || !Array.isArray(tags) || !tags.length) {
         return res.status(400).json({message: 'All fields are required'})
     }
 
-    const duplicate = await User.findOne({ title }).lean().exec();
+    const duplicate = await BlogPost.findOne({ title }).lean().exec();
 
-    if (duplicate && duplicate._id.toSring() !== id) {
+    if (duplicate && duplicate?._id.toSring() !== id) {
         return res.status(409).json({message: 'duplicate title' });
     }
 
@@ -85,13 +87,13 @@ exports.updatePosts =  asyncHandler(async (req, res) => {
 
     // update image in s3 bucket
 
-    const updatedBlogPost = await BlogPost.save(blogPost);
-    res.status(201).json({message: `Successful update: ${updatedBlogPost}`});
+    const updatedBlogPost = await blogPost.save(blogPost);
+    return res.status(201).json({message: `Successful update: ${updatedBlogPost}`});
 
 });
 
 exports.deletePosts =  asyncHandler(async (req, res) => {
-    const { id } = req.body;
+    const id  = req.params.postsId
     if (!id) {
         return res.status(400).json({ message: 'Blog post ID Required' }); 
     }
@@ -100,7 +102,7 @@ exports.deletePosts =  asyncHandler(async (req, res) => {
         return res.status(400).json({ message: 'Blog post not found' });
     }
     const result = await blogPost.deleteOne();
-    const reply = `Blog post: ${result.title} by ${result.author} with ID ${result.id} deleted`
+    const reply = `Blog post: ${result.title} with ID ${result.id} deleted`
     res.json(reply);
 
 });

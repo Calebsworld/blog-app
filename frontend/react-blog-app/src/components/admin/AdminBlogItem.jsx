@@ -3,7 +3,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom';
 
 import { deleteBlog } from '../../hooks/adminApis'
-import { useMutation, QueryClient } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -13,23 +13,23 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button'
 
 export const AdminBlogItem = ({ blog }) => {
+
+  const queryClient = new useQueryClient()
   
-    const queryClient = new QueryClient()
+  const tags = blog.tags.map(tag => {
+    return JSON.parse(tag)
+  }) 
 
-    const tags = blog.tags.map(tag => {
-        return JSON.parse(tag)
-    }) 
+  const deleteBlogMutation = useMutation(deleteBlog, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('getAllBlogs')
+    },
+  })   
+
+  const handleDelete = id => {
+    deleteBlogMutation.mutate(id)
+  }
   
-    const deleteBlogMutation = useMutation(id => {
-      return deleteBlog(id)   
-    })   
-
-    const deleteBlog = id => {
-      deleteBlogMutation.mutate(id)
-    }
-
-    
-
     return (
         <Container>
           <Row>
@@ -48,8 +48,8 @@ export const AdminBlogItem = ({ blog }) => {
                     })}  
                 </ListGroup>
                 <Card.Body>
-                    <Button as={NavLink} to={'/admin/update'} state={blog._id} onClick={() => console.log(blog._id)} className='me-2' variant="primary"> Update </Button>
-                    <Button onClick={deleteBlog} variant="danger"> Delete </Button>
+                    <Button as={NavLink} to={'/admin/update'} state={blog._id} className='me-2' variant="primary"> Update </Button>
+                    <Button onClick={() => handleDelete(blog._id)} variant="danger"> Delete </Button>
                 </Card.Body>
               </Card>
             </Col>

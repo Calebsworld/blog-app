@@ -1,15 +1,16 @@
 import React from 'react'
 import { useEffect } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+
 import { Header } from '../Header';
 
 import { postBlog } from '../../hooks/adminApis'
-import { useMutation, QueryClient } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
-import * as yup from 'yup';
+import { blogSchema } from '../../yupSchemas/blogFormSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
-
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -17,24 +18,11 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
-export const WriteBlogForm = () => {
+export const WriteBlogForm = ({ history }) => {
  
-  const queryClient = new QueryClient()
+const queryClient = new useQueryClient()
 
-  const schema = yup.object().shape({
-    title: yup.string().min(5).max(50).required('Title Required'),
-    content: yup.string().min(5).max(5000).required('Content Required'),
-    tags: yup
-    .array()
-    .of(yup
-        .object()
-        .shape({
-          tag: yup.string().min(5, 'Tag must contain atleast 2 characters').max(30, 'Tag must not exceed 30 characters').required()
-        })
-      )
-    .required('Tags required')
-  
-  })
+let navigate = useNavigate();
 
   const { 
     register, 
@@ -45,7 +33,7 @@ export const WriteBlogForm = () => {
   } 
   = useForm({
     mode: 'onChange',
-    resolver: yupResolver(schema),
+    resolver: yupResolver(blogSchema),
       defaultValues: {
         title: '',
         content: '',
@@ -68,15 +56,16 @@ export const WriteBlogForm = () => {
     control
   })
   
-  const postBlogMutation = useMutation(blogData => {
-    return postBlog(blogData);
+  const postBlogMutation = useMutation(postBlog, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('getAllBlogs')
+    },
   })
 
   const createFormDataObj = data => {
     const form = document.getElementById('form')
     const formData = new FormData(form);
     const completeFormData = new FormData();
-    completeFormData.append('id', formData.get('id'));
     completeFormData.append('title', formData.get('title'));
     completeFormData.append('content', formData.get('content'));
     completeFormData.append('image', formData.get('image'));
@@ -86,8 +75,9 @@ export const WriteBlogForm = () => {
 
 const onSubmit = async data => {
   console.log(data)
-  const fd = createFormDataObj()
+  const fd = createFormDataObj(data)
   postBlogMutation.mutate(fd);
+  navigate('/admin/blogs')
 } 
 
   useEffect(() => {
