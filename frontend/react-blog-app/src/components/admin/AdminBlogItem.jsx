@@ -16,10 +16,6 @@ export const AdminBlogItem = ({ blog }) => {
 
   const queryClient = new useQueryClient()
   
-  const tags = blog.tags.map(tag => {
-    return JSON.parse(tag)
-  }) 
-
   const deleteBlogMutation = useMutation(deleteBlog, {
     onSuccess: () => {
       queryClient.invalidateQueries('getAllBlogs')
@@ -41,9 +37,9 @@ export const AdminBlogItem = ({ blog }) => {
                   <Card.Text> { blog.content} </Card.Text>
                 </Card.Body>
                 <ListGroup className="list-group-flush">
-                    {tags.map(tag => {
+                    {blog.tags.map(tag => {
                     return (
-                    <ListGroup.Item key={tag.rowKey}> #{ tag.tag } </ListGroup.Item>
+                    <ListGroup.Item key={tag.rowKey}> #{ tag.name } </ListGroup.Item>
                     )
                     })}  
                 </ListGroup>

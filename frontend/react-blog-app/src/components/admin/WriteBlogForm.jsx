@@ -1,6 +1,5 @@
 import React from 'react'
-import { useEffect } from 'react';
-
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Header } from '../Header';
@@ -8,9 +7,11 @@ import { Header } from '../Header';
 import { postBlog } from '../../hooks/adminApis'
 import { useMutation, useQueryClient } from 'react-query'
 
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { blogSchema } from '../../yupSchemas/blogFormSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
+
+import { v4 as uuidv4 } from 'uuid';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -18,14 +19,15 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
-export const WriteBlogForm = ({ history }) => {
+export const WriteBlogForm = () => {
  
-const queryClient = new useQueryClient()
+const queryClient = new useQueryClient()  
 
+const [tag, setTag] = useState('');
+const [tagsList, setTagsList] = useState([]);
 let navigate = useNavigate();
 
   const { 
-    register, 
     handleSubmit, 
     formState,
     control, 
@@ -37,30 +39,31 @@ let navigate = useNavigate();
       defaultValues: {
         title: '',
         content: '',
-        image: '',
-        tags: [{
-          tag: ''
-        }]
+        image: ''
       }
      });
      
   const { errors, isSubmitSuccessful } = formState;
-
-  const {
-    fields,
-    append, 
-    remove
-  }
-  = useFieldArray({
-    name: 'tags',
-    control
-  })
   
-  const postBlogMutation = useMutation(postBlog, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('getAllBlogs')
-    },
-  })
+  const addTagToTagsArray = tag => {
+    if (tag.length > 0) {
+      const id = uuidv4();
+      const tagObject = { id, name: tag }
+      setTagsList([...tagsList, tagObject])
+      setTag('')
+    }
+  }
+  
+  const removeTagFromTagsArray = tag => {
+    const filteredArray = tagsList.filter(t => tag !== t)
+    setTagsList(filteredArray)
+  }
+
+  const resetFormState = () => {
+      setTag('')
+      setTagsList([])
+      reset();
+  }
 
   const createFormDataObj = data => {
     const form = document.getElementById('form')
@@ -69,22 +72,22 @@ let navigate = useNavigate();
     completeFormData.append('title', formData.get('title'));
     completeFormData.append('content', formData.get('content'));
     completeFormData.append('image', formData.get('image'));
-    data.tags.forEach(tag => completeFormData.append('tags[]', JSON.stringify(tag)));
+    completeFormData.append('tags[]', JSON.stringify(tagsList))
     return completeFormData;
   }
 
+  const postBlogMutation = useMutation(postBlog, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('getAllBlogs')
+      resetFormState()
+      navigate('/admin/blogs')
+    },
+  })
+
 const onSubmit = async data => {
-  console.log(data)
   const fd = createFormDataObj(data)
   postBlogMutation.mutate(fd);
-  navigate('/admin/blogs')
 } 
-
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset();
-    }
-  }, [formState, reset]);
 
   return (
     <Container>
@@ -181,63 +184,48 @@ const onSubmit = async data => {
               
             </Form.Group>
             
-            <Row>
-              <Col>
-              <h4 className='pb-3'>Hashtags</h4>
-                <Button
-                className='m-1' 
-                onClick={() => {
-                  append([{
-                    tag: ''
-                  }])
-                }} 
-                variant="primary" 
-                type="button">
-                Add Tag
-               </Button>
-              </Col>
-            </Row>
-          
-            {fields.map((field, index) => {
-              return (
-                <section key={field.id} className='mt-3'>
-                  <Row>
-                    <Col>
-                      <label>
-                        <input placeholder='#' name='tag' {...register(`tags.${index}.tag`)} type="text" />
-                      </label>
-                      {`errors.tags[${index}]?.tag?.type` == "required" && (
-                        <Form.Control.Feedback type="invalid">
-                          Tag required
-                        </Form.Control.Feedback>
-                      )}
-                      {`errors.tags[${index}]?.tag?.type` && (
-                        <Form.Control.Feedback type="invalid">
-                          Tag must contain atleast 5 characters
-                        </Form.Control.Feedback>
-                      )}
-                      {`errors.tags[${index}]?.tag?.type` == "max" && (
-                        <Form.Control.Feedback type="invalid">
-                          Tag must not exceed 30 characters
-                        </Form.Control.Feedback>
-                      )}
-                    </Col>
-
-                    <Col>
-                      <Button
-                        type='button'
-                        className='btn-danger'
-                        onClick={index => {
-                          remove(index)
-                        }}>
-                        Delete
-                      </Button>
-                    </Col>
-                  </Row>
-                </section>
-              )
-            })}    
-            <Row className='mt-5'>
+            <Form.Group className="mb-3" controlId="formTags">
+              <Form.Label>Tags</Form.Label>
+                  <Form.Control
+                    type='text'
+                    name='tag'
+                    value={tag}
+                    onChange={(e) => setTag(e.target.value)}
+                    placeholder="Add tag"
+                  />
+                  <div className='mt-2'>
+                    {
+                      tagsList.map(tag => {
+                        return (
+                          <div>
+                            <span 
+                              key={tag.id}> 
+                              {tag.name} 
+                            </span>
+                            <Button
+                            className='mt-2' 
+                            onClick={() => removeTagFromTagsArray(tag)}
+                            type='button'
+                            variant='danger'
+                          >
+                          Delete tag
+                          </Button>
+                        </div>
+                        )
+                      })
+                    }
+                  </div>
+                  <Button
+                    className='mt-2' 
+                    onClick={() => addTagToTagsArray(tag)}
+                    type='button'
+                    variant='primary'
+                  >
+                  Add tag
+                  </Button>
+              </Form.Group>
+              
+              <Row className='mt-5'>
               <Col>
                 <Button
                   className='m-1' 
@@ -246,7 +234,7 @@ const onSubmit = async data => {
                   Submit
                 </Button>
                 <Button 
-                  onClick={() => reset()} 
+                  onClick={() => resetFormState()}
                   variant="secondary" 
                   type="button" 
                   className='ms-1'>

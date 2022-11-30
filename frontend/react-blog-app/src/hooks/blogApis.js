@@ -3,7 +3,7 @@ import { useMutation, useQuery  } from 'react-query'
 
 export const useGetAllBlogs = () => {
     return useQuery('getAllBlogs', getAllBlogs, {
-        retry: 3
+        staleTime: 100000,
     }) 
 }
 
@@ -12,7 +12,9 @@ export const getAllBlogs = () => {
 }
 
 export const useBlogData = blogId => {
-    return useQuery(['getBlogById', blogId], getBlogById)
+    return useQuery(['getBlogById', blogId], getBlogById, {
+        staleTime: Infinity
+    })
 }
 
 export const getBlogById = ({ queryKey }) => {

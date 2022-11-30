@@ -13,8 +13,12 @@ exports.createPosts = asyncHandler (async (req, res) => {
    
     const title = req.body.title;
     const content = req.body.content;
-    const tags = req.body.tags
-    
+    let tags = JSON.parse(req.body.tags);
+    tags = tags.map(tag => {
+        return { name: tag.name }
+    });
+
+
     if (!title || !content || !Array.isArray(tags) || !tags.length) {
        return res.status(400).json({message: 'All fields are required'})
     }
@@ -62,8 +66,10 @@ exports.updatePosts =  asyncHandler(async (req, res) => {
     const id = req.params.postsId
     const title = req.body.title;
     const content = req.body.content; 
-    const tags = req.body.tags
-    console.log(title)
+    let tags = JSON.parse(req.body.tags);
+    tags = tags.map(tag => {
+        return { name: tag.name }
+    })
 
     if (!id || !title || !content || !Array.isArray(tags) || !tags.length) {
         return res.status(400).json({message: 'All fields are required'})
@@ -71,7 +77,7 @@ exports.updatePosts =  asyncHandler(async (req, res) => {
 
     const duplicate = await BlogPost.findOne({ title }).lean().exec();
 
-    if (duplicate && duplicate?._id.toSring() !== id) {
+    if (duplicate && duplicate?._id.valueOf() !== id) {
         return res.status(409).json({message: 'duplicate title' });
     }
 
