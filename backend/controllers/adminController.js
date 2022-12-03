@@ -55,12 +55,13 @@ exports.createPosts = asyncHandler (async (req, res) => {
 });
 
 exports.updatePosts =  asyncHandler(async (req, res) => {
+    
     const id = req.params.postsId
     const title = req.body.title;
-    const content = req.body.content; 
-    let tags = JSON.parse(req.body.tags);
+    const content = req.body.content;
+    let tags = req.body.tags;
     tags = tags.map(tag => {
-        return { name: tag.name }
+         return { name: tag.name }
     })
 
     if (!id || !title || !content || !Array.isArray(tags) || !tags.length) {
@@ -86,7 +87,7 @@ exports.updatePosts =  asyncHandler(async (req, res) => {
     const updatedBlogPost = await blogPost.save(blogPost);
     return res.status(201).json({message: `Successful update: ${updatedBlogPost}`});
 
-});
+ });
 
 exports.deletePosts =  asyncHandler(async (req, res) => {
     const id  = req.params.postsId
