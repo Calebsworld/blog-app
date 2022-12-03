@@ -31,6 +31,7 @@ export const AdminBlogItem = ({ blog }) => {
           <Row>
             <Col lg={6} className='mx-auto mt-4'>
                 <Card style={{ width: '18rem' }}>
+                  <Card.Img variant="top" src={blog.imageUrl} />
                   <Card.Body>
                   <Card.Title> { blog.title} </Card.Title>
                   <Card.Subtitle className="mb-2 text-muted">Leslie Stephens</Card.Subtitle>

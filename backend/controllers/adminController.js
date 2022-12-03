@@ -1,16 +1,15 @@
 const BlogPost = require('../models/BlogPost');
-
 const asyncHandler = require('express-async-handler');
-
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const client = require('../util/s3Client')
+const { PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const crpyto = require('crypto')
+const sharp = require('sharp');
 
 const bucketName = process.env.BUCKET_NAME;
-const bucketRegion = process.env.BUCKET_REGION;
-const accessKey = process.env.ACCESS_KEY;
-const secretAccessKey = process.env.SECRET_ACCESS_KEY;
+
+const randomImageName = (bytes=32) => crpyto.randomBytes(bytes).toString('hex')
 
 exports.createPosts = asyncHandler (async (req, res) => {        
-   
     const title = req.body.title;
     const content = req.body.content;
     let tags = JSON.parse(req.body.tags);
@@ -18,43 +17,36 @@ exports.createPosts = asyncHandler (async (req, res) => {
         return { name: tag.name }
     });
 
-
     if (!title || !content || !Array.isArray(tags) || !tags.length) {
        return res.status(400).json({message: 'All fields are required'})
     }
 
     if (!req.file) {
-        throw Error("FILE_MISSING");
+        return res.status(400).json({message: 'File not found'})
       } 
 
     const duplicate = await BlogPost.findOne({ title }).lean().exec();
     if (duplicate) {
         return res.status(409).json({message: 'duplicate title' });
     }
+    
+    const imageName = randomImageName()
+    const buffer = await sharp(req.file.buffer).resize({height: 1920, width: 1080, fit: 'contain' }).toBuffer()
 
-    const blogPostObject = {title, content, tags};
+    const params = {
+        Bucket: bucketName,
+        Key: imageName,
+        Body: buffer,
+        ContentType: req.file.mimetype,
+    };
+
+    const command = new PutObjectCommand(params);
+    await client.send(command);
+
+    const blogPostObject = {title, content, imageName, tags };
     const blogPost = await BlogPost.create(blogPostObject);
 
     if (blogPost) {
-
-        const s3 = new S3Client({
-            credentials: {
-                accessKeyId: accessKey,
-                secretAccessKey: secretAccessKey,
-            },
-            region: bucketRegion
-        });
-    
-        const params = {
-            Bucket: bucketName,
-            Key: req.file.originalname,
-            Body: req.file.buffer,
-            ContentType: req.file.mimetype,
-        };
-    
-        const command = new PutObjectCommand(params);
-        await s3.send(command);
-
         return res.status(201).json({message: `Blog post created ${blogPostObject.title}`});
     } else {
         return res.status(409).json({message: 'Invalid data recieved'});
@@ -78,7 +70,7 @@ exports.updatePosts =  asyncHandler(async (req, res) => {
     const duplicate = await BlogPost.findOne({ title }).lean().exec();
 
     if (duplicate && duplicate?._id.valueOf() !== id) {
-        return res.status(409).json({message: 'duplicate title' });
+        return res.status(409).json({message: 'Duplicate title' });
     }
 
     const blogPost = await BlogPost.findById(id);
@@ -90,8 +82,6 @@ exports.updatePosts =  asyncHandler(async (req, res) => {
     blogPost.title = title;
     blogPost.content = content;
     blogPost.tags = tags;
-
-    // update image in s3 bucket
 
     const updatedBlogPost = await blogPost.save(blogPost);
     return res.status(201).json({message: `Successful update: ${updatedBlogPost}`});
@@ -107,8 +97,15 @@ exports.deletePosts =  asyncHandler(async (req, res) => {
     if (!blogPost) {
         return res.status(400).json({ message: 'Blog post not found' });
     }
-    const result = await blogPost.deleteOne();
-    const reply = `Blog post: ${result.title} with ID ${result.id} deleted`
-    res.json(reply);
 
+    const params = {
+        Bucket: bucketName,
+        Key: blogPost.imageName
+    }
+    const command = new DeleteObjectCommand(params);
+    await client.send(command)
+    
+    const result = await blogPost.deleteOne();
+    const reply = `Blog post: ${result.title} deleted`
+    res.json(reply);
 });

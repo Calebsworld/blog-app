@@ -9,7 +9,7 @@ import { updateBlog } from '../../hooks/adminApis'
 import { useMutation, useQueryClient } from 'react-query'
 
 import { Controller, useForm } from 'react-hook-form'
-import { blogSchema } from '../../yupSchemas/blogFormSchema';
+import { updateBlogSchema } from '../../yupSchemas/updateBlogSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -42,11 +42,10 @@ const {
 } 
 = useForm({
   mode: 'onChange',
-  resolver: yupResolver(blogSchema),
+  resolver: yupResolver(updateBlogSchema),
     defaultValues: {
       title: '',
-      content: '',
-      image: ''
+      content: ''
     }
    });
       
@@ -170,26 +169,6 @@ const updateBlogMutation = useMutation(updateBlog, {
                   Content must not exceed 50 characters
                 </Form.Control.Feedback>
               )}
-            </Form.Group>
-    
-            <Form.Group className="mb-3">
-              <Form.Label>Select file as an image for your posts</Form.Label>
-              <Controller
-                name='image'
-                control={control}
-                render={({ field: { onChange, onBlur, value, name, ref } }) => (
-                  <Form.Control
-                    type="file"
-                    id='file'
-                    name={name}
-                    value={value}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    isInvalid={errors.image}
-                  />
-                )}
-              />
-              
             </Form.Group>
             
             <Form.Group className="mb-3" controlId="formTags">

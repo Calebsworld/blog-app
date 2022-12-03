@@ -10,6 +10,10 @@ const BlogPostSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    imageName: {
+        type: String,
+        required: true
+    },
     // author: {
     //     type: mongoose.SchemaTypes.ObjectId,
     //     required: true,
@@ -34,7 +38,7 @@ const BlogPostSchema = mongoose.Schema({
 });
 
 BlogPostSchema.plugin(AutoIncrement, {
-    inc_field: 'id',
+    inc_field: 'blogId',
     start_seq: 1
 });
 

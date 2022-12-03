@@ -4,7 +4,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
-import ListGroup from 'react-bootstrap/ListGroup';
+import ListGroup from 'react-bootstrap/ListGroup'
 
 export const BlogItem = ({ blog }) => {
 
@@ -13,15 +13,16 @@ export const BlogItem = ({ blog }) => {
       <Row>
         <Col lg={6} className='mx-auto mt-4'>
           <Card style={{ width: '18rem' }}>
-              <Card.Body>
-              <Card.Title> { blog.title} </Card.Title>
+            <Card.Img variant="top" src={blog.imageUrl} />
+            <Card.Body>
+              <Card.Title> {blog.title} </Card.Title>
               <Card.Subtitle className="mb-2 text-muted">Leslie Stephens</Card.Subtitle>
-              <Card.Text> { blog.content} </Card.Text>
+              <Card.Text> {blog.content} </Card.Text>
             </Card.Body>
           <ListGroup className="list-group-flush">
           {blog.tags.map(tag => {
             return (
-              <ListGroup.Item key={tag.rowKey}> #{ tag.name } </ListGroup.Item>
+              <ListGroup.Item key={tag.rowKey}> #{tag.name} </ListGroup.Item>
             )
           })}  
           </ListGroup>

@@ -21,7 +21,7 @@ export const BlogsList = ( { blogs } ) => {
             <Col>
                 <ul>
                     {blogs.map(blog => {
-                    return <BlogItem key={blog.id} blog={blog} />
+                    return <BlogItem key={blog._id} blog={blog} />
                     }) 
                     }
                 </ul>

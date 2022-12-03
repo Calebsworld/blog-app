@@ -3,12 +3,14 @@ import { useMutation, useQuery  } from 'react-query'
 
 export const useGetAllBlogs = () => {
     return useQuery('getAllBlogs', getAllBlogs, {
-        staleTime: 100000,
+        staleTime: 10000,
     }) 
 }
 
-export const getAllBlogs = () => { 
-    return axios.get('http://localhost:3500/api/blogs')  
+export const getAllBlogs = async () => { 
+    const blogs = await axios.get('http://localhost:3500/api/blogs')  
+    console.log(blogs)
+    return blogs
 }
 
 export const useBlogData = blogId => {
@@ -17,7 +19,7 @@ export const useBlogData = blogId => {
     })
 }
 
-export const getBlogById = ({ queryKey }) => {
+export const getBlogById = async ({ queryKey }) => {
     const blogId = queryKey[1]
-    return axios.get(`http://localhost:3500/api/blogs/${blogId}`)
+    return await axios.get(`http://localhost:3500/api/blogs/${blogId}`)
 }

@@ -4,39 +4,30 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser')
 const cors = require('cors');
-
-
 const path = require('path');
-
 const { logger, logEvents } = require('./middleware/logger');
 const errorHandler = require('./middleware/errorHandler');
 const connectDB = require('./config/dbConn');
-const corsOptions = require('./config/corsOptions');
-
-//===========================================================================================================
-
-const app = express();
-const PORT = process.env.PORT || 3500;
-
-connectDB();
-
-app.use(logger);
-
-app.use(express.json());
-
-app.use(cors({
-    origin: '*'
-}))
-
-app.use(cookieParser());
-
-app.use('/', express.static(path.join(__dirname, 'public')));
-
-//===========================================================================================================
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
 const blogRoutes = require('./routes/blogRoutes');
+
+//Global Middleware
+
+const app = express();
+const PORT = process.env.PORT || 3500;
+connectDB();
+
+app.use(logger);
+app.use(express.json());
+app.use(cors({
+    origin: '*'
+}))
+app.use(cookieParser());
+app.use('/', express.static(path.join(__dirname, 'public')));
+
+//Routes
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
@@ -53,18 +44,6 @@ app.all('*', (req, res) => {
         res.type('text').send('404 Not Found');
     }
 });
-
-// app.use((err, req, res, next) => {
-//     if (err instanceof multer.MulterError) {
-//       res.statusCode = 400;
-//       res.send(err.code);
-//     } else if (err) {
-//       if (err.message === "FILE_MISSING") {
-//         res.statusCode = 400;
-//         res.send("FILE_MISSING");
-//       }
-//     }
-//   });
 
 app.use(errorHandler);
 

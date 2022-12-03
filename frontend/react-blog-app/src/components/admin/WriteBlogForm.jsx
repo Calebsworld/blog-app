@@ -8,7 +8,7 @@ import { postBlog } from '../../hooks/adminApis'
 import { useMutation, useQueryClient } from 'react-query'
 
 import { Controller, useForm } from 'react-hook-form'
-import { blogSchema } from '../../yupSchemas/blogFormSchema';
+import { writeBlogSchema } from '../../yupSchemas/writeBlogSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -35,11 +35,11 @@ let navigate = useNavigate();
   } 
   = useForm({
     mode: 'onChange',
-    resolver: yupResolver(blogSchema),
+    resolver: yupResolver(writeBlogSchema),
       defaultValues: {
         title: '',
         content: '',
-        image: ''
+        image: '',
       }
      });
      
@@ -174,13 +174,14 @@ const onSubmit = async data => {
                     type="file"
                     id='file'
                     name={name}
-                    value={value}
-                    onChange={onChange}
+                    // value={value}
+                    onChange={(e) => onChange(e.target.files)}
                     onBlur={onBlur}
                     isInvalid={errors.image}
                   />
                 )}
               />
+              {errors.image && <Form.Control.Feedback type="invalid">{errors.image.message}</Form.Control.Feedback>}       
               
             </Form.Group>
             
