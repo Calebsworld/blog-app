@@ -45,7 +45,7 @@ const {
   resolver: yupResolver(updateBlogSchema),
     defaultValues: {
       title: '',
-      content: ''
+      content: '',
     }
    });
       
@@ -71,20 +71,8 @@ const resetFormState = () => {
     reset();
 }
 
-const createFormDataObj = data => {
-  const form = document.getElementById('form')
-  const formData = new FormData(form);
-  const completeFormData = new FormData();
-  completeFormData.append('title', formData.get('title'));
-  completeFormData.append('content', formData.get('content'));
-  completeFormData.append('image', formData.get('image'));
-  completeFormData.append('tags[]', JSON.stringify(tagsList))
-  return completeFormData;
-}
-
 const onSubmit = async data => {
-  const fd = createFormDataObj(data)
-  const blogDataObject = { id, blogData: fd }
+  const blogDataObject = { id, blogData: {title: data.title, content: data.content, tags: tagsList} }
   updateBlogMutation.mutate(blogDataObject);
 } 
 
@@ -119,21 +107,7 @@ const updateBlogMutation = useMutation(updateBlog, {
                   />
                 )}
               />
-              {errors.title?.type == "required" && (
-                <Form.Control.Feedback type="invalid">
-                  Title required
-                </Form.Control.Feedback>
-              )}
-              {errors.title?.type == "min" && (
-                <Form.Control.Feedback type="invalid">
-                Title must contain atleast 5 characters
-                </Form.Control.Feedback>
-              )}
-              {errors.title?.type == "max" && (
-                <Form.Control.Feedback type="invalid">
-                  Title must not exceed 50 characters
-                </Form.Control.Feedback>
-              )}
+               {errors.title && <Form.Control.Feedback type="invalid">{errors.title.message}</Form.Control.Feedback>}  
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formContent">
@@ -154,21 +128,7 @@ const updateBlogMutation = useMutation(updateBlog, {
                   />
                 )}
               />
-              {errors.content?.type == "required" && (
-                <Form.Control.Feedback type="invalid">
-                  Content required
-                </Form.Control.Feedback>
-              )}
-              {errors.content?.type == "min" && (
-                <Form.Control.Feedback type="invalid">
-                  Content must contain atleast 5 characters
-                </Form.Control.Feedback>
-              )}
-              {errors.content?.type == "max" && (
-                <Form.Control.Feedback type="invalid">
-                  Content must not exceed 50 characters
-                </Form.Control.Feedback>
-              )}
+              {errors.content && <Form.Control.Feedback type="invalid">{errors.content.message}</Form.Control.Feedback>}  
             </Form.Group>
             
             <Form.Group className="mb-3" controlId="formTags">
