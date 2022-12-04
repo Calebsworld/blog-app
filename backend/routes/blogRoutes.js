@@ -4,8 +4,8 @@ const blogsController = require('../controllers/blogsController');
 
 const router = express.Router();
 
-router.get('/blogs', blogsController.getAllPosts);
+router.get('/posts', blogsController.getAllPosts);
 
-router.get('/blogs/:blogPostId', blogsController.getPostById);
+router.get('/posts/:blogPostId', blogsController.getPostById);
 
 module.exports = router;

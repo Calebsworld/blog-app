@@ -17,10 +17,10 @@ exports.getAllPosts = asyncHandler(async (req, res) => {
          }
          const command = new GetObjectCommand(getObjectParams);
          const url = await getSignedUrl(client, command, { expiresIn: 60 })
-         return {...post.toJSON(), imageUrl: url };
+         return {...post.toObject(), imageUrl: url };
       })
       const results = await Promise.all(mappedblogPosts)
-      if (!blogPosts) {
+      if (!results) {
          return res.status(400).json({message: 'No blog posts found'});
       }
       return res.status(200).json(results);

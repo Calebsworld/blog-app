@@ -1,6 +1,10 @@
 import axios from 'axios'
 import { useMutation, useQuery  } from 'react-query'
 
+const blogsApi = axios.create({
+    baseURL: '/api/blogs'
+})
+
 export const useGetAllBlogs = () => {
     return useQuery('getAllBlogs', getAllBlogs, {
         staleTime: 10000,
@@ -8,8 +12,7 @@ export const useGetAllBlogs = () => {
 }
 
 export const getAllBlogs = async () => { 
-    const blogs = await axios.get('http://localhost:3500/api/blogs')  
-    console.log(blogs)
+    const blogs = await blogsApi.get('/posts');  
     return blogs
 }
 
@@ -21,5 +24,5 @@ export const useBlogData = blogId => {
 
 export const getBlogById = async ({ queryKey }) => {
     const blogId = queryKey[1]
-    return await axios.get(`http://localhost:3500/api/blogs/${blogId}`)
+    return await blogsApi.get(`posts/${blogId}`)
 }

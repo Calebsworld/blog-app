@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { Header } from '../components/Header'
-import { BlogsList } from '../components/blog/BlogsList'
+import { Header } from '../components/Header';
+import { BlogsList } from '../components/blog/BlogsList';
 
-import { QueryClient, useQuery, useQueryClient } from 'react-query'
-import axios from 'axios'
+import {  useQueryClient } from 'react-query';
+import { useGetAllBlogs } from '../hooks/blogApis';
 
 import Spinner from 'react-bootstrap/Spinner';
 
@@ -12,13 +12,7 @@ export const Home = () => {
 
   const queryClient = useQueryClient();
 
-  const { 
-    isLoading, 
-    isError, 
-    data:blogs, 
-    error} = useQuery('getAllBlogs', async () => 
-      await axios.get('http://localhost:3500/api/blogs')
-    );
+  const { isLoading, isError, data:blogs, error} = useGetAllBlogs();
 
   if (isLoading) {
     return (

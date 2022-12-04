@@ -43,7 +43,7 @@ let navigate = useNavigate();
       }
      });
      
-  const { errors, isSubmitSuccessful } = formState;
+  const { errors } = formState;
   
   const addTagToTagsArray = tag => {
     if (tag.length > 0) {
@@ -112,21 +112,7 @@ const onSubmit = async data => {
                   />
                 )}
               />
-              {errors.title?.type == "required" && (
-                <Form.Control.Feedback type="invalid">
-                  Title required
-                </Form.Control.Feedback>
-              )}
-              {errors.title?.type == "min" && (
-                <Form.Control.Feedback type="invalid">
-                Title must contain atleast 5 characters
-                </Form.Control.Feedback>
-              )}
-              {errors.title?.type == "max" && (
-                <Form.Control.Feedback type="invalid">
-                  Title must not exceed 50 characters
-                </Form.Control.Feedback>
-              )}
+              {errors.title && <Form.Control.Feedback type="invalid">{errors.title.message}</Form.Control.Feedback>}  
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formContent">
@@ -147,21 +133,7 @@ const onSubmit = async data => {
                   />
                 )}
               />
-              {errors.content?.type == "required" && (
-                <Form.Control.Feedback type="invalid">
-                  Content required
-                </Form.Control.Feedback>
-              )}
-              {errors.content?.type == "min" && (
-                <Form.Control.Feedback type="invalid">
-                  Content must contain atleast 5 characters
-                </Form.Control.Feedback>
-              )}
-              {errors.content?.type == "max" && (
-                <Form.Control.Feedback type="invalid">
-                  Content must not exceed 50 characters
-                </Form.Control.Feedback>
-              )}
+              {errors.content && <Form.Control.Feedback type="invalid">{errors.content.message}</Form.Control.Feedback>}  
             </Form.Group>
     
             <Form.Group className="mb-3">
@@ -174,7 +146,6 @@ const onSubmit = async data => {
                     type="file"
                     id='file'
                     name={name}
-                    // value={value}
                     onChange={(e) => onChange(e.target.files)}
                     onBlur={onBlur}
                     isInvalid={errors.image}
@@ -182,7 +153,6 @@ const onSubmit = async data => {
                 )}
               />
               {errors.image && <Form.Control.Feedback type="invalid">{errors.image.message}</Form.Control.Feedback>}       
-              
             </Form.Group>
             
             <Form.Group className="mb-3" controlId="formTags">
@@ -193,7 +163,7 @@ const onSubmit = async data => {
                     value={tag}
                     onChange={(e) => setTag(e.target.value)}
                     placeholder="Add tag"
-                  />
+                  /> 
                   <div className='mt-2'>
                     {
                       tagsList.map(tag => {

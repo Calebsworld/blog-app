@@ -3,14 +3,13 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react({
-      babel: {
-        plugins: ['@babel/plugin-transform-react-jsx'],
-      },
+      plugins: [react()],
       server: {
         proxy: {
-          'api': 'http://localhost:3500/'
+          '/api': {
+            target: 'http://localhost:3500/',
+            changeOrigin: true,
+          }
         }
-      }
-  })],
+      },
 })
